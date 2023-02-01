@@ -1,0 +1,13 @@
+version: 1.0
+
+# Shell script to run when pushing the source code to the scratch orgs.
+# It's a great place to automate tasks like permission set assignments or data loading.
+push_script: |
+  sfdx --version
+  sfdx force:source:push -f --loglevel fatal 1>/dev/null
+
+# Shell script to run when pulling the source code from the scratch org.
+# Adding the "| hutte_track_changes" to the end of the pull command is important in order for
+# hutte to track which metadata was changed.
+pull_script: |
+  sfdx force:source:pull --loglevel fatal --json -f | hutte_track_changes
