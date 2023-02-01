@@ -25,7 +25,7 @@ jobs:
       - name: Validate deploying changes to target org
         # Note: This requires the merged PR to only have a single commit or merge commit
         run: |
-          sfdx sgd:source:delta --from "${GITHUB_BASE_REF}" --to "HEAD" --output "." --ignore .forceignore
+          sfdx sgd:source:delta --from "origin/${GITHUB_BASE_REF}" --to "HEAD" --output "." --ignore .forceignore
           echo "# package.xml"
           cat package/package.xml || true
           echo "# destructiveChanges.xml"
