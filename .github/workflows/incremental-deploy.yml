@@ -1,0 +1,35 @@
+# Based on https://github.com/mehdisfdc/sfdx-GitHub-actions/blob/main/.github/workflows/main.yml
+name: Incremental deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  default:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Salesforce CLI
+        run: |
+          npm install --global sfdx-cli
+          sfdx --version
+      - name: Install sfdx plugin
+        run: |
+          echo y | sfdx plugins:install sfdx-git-delta
+          sfdx plugins
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Authenticate target org
+        run: |
+          sfdx force:auth:sfdxurl:store --setdefaultusername --sfdxurlfile /dev/stdin <<< "${{ secrets.SFDX_AUTH_URL }}"
+      - name: Deploy changes to target org
+        # Note: This requires the merged PR to only have a single commit or merge commit
+        run: |
+          sfdx sgd:source:delta --from "HEAD~1" --to "HEAD" --output "." --ignore .forceignore
+          echo "# package.xml"
+          cat package/package.xml || true
+          echo "# destructiveChanges.xml"
+          cat package/destructiveChanges.xml || true
+          sfdx force:source:deploy --manifest package/package.xml --postdestructivechanges destructiveChanges/destructiveChanges.xml --wait 30 --testlevel RunLocalTests
