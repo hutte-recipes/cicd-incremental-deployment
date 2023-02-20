@@ -22,8 +22,8 @@ jobs:
         run: |
           sfdx force:auth:sfdxurl:store --setdefaultusername --sfdxurlfile <(echo "${{ secrets.SFDX_AUTH_URL }}")
       - name: Validate deploying changes to target org
-        # Note: This requires the merged PR to only have a single commit or merge commit
         run: |
+          git merge "origin/${GITHUB_BASE_REF}"
           sfdx sgd:source:delta --from "origin/${GITHUB_BASE_REF}" --to "HEAD" --output "." --ignore .forceignore
           echo "# package.xml"
           cat package/package.xml || true
