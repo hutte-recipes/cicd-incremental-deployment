@@ -1,6 +1,6 @@
 # Hutte Recipe - CI/CD Incremental Deployment
 
-> This uses [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta) to incrementally deploy changes.
+> This recipe uses [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta) to incrementally deploy changes.
 
 > **Note** PRs need to be merged via "Create a merge commit" or "Squash and merge" option to correctly detect the changes.
 
@@ -108,4 +108,4 @@ Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > New
 ### Step 3
 
 - Create a PR and verify the Action was run successfully
-- Merge the PR and verify the Actions was run successfully
+- Merge the PR and verify the Action was run successfully
