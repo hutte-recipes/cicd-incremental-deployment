@@ -13,44 +13,7 @@
 
 ### Step 1
 
-Create the following two GitHub Workflows:
-
-`.github/workflows/incremental-validate.yml`
-
-```yaml
-# Based on https://github.com/mehdisfdc/sfdx-GitHub-actions/blob/main/.github/workflows/main.yml
-name: Incremental validation deployment
-
-on:
-  pull_request:
-
-jobs:
-  default:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Salesforce CLI
-        run: |
-          npm install --global sfdx-cli
-          sfdx --version
-      - name: Install sfdx plugin
-        run: |
-          echo y | sfdx plugins:install sfdx-git-delta
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Authenticate target org
-        run: |
-          sfdx org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_AUTH_URL_TARGET_ORG }}")
-      - name: Validate deploying changes to target org
-        run: |
-          git merge "origin/${GITHUB_BASE_REF}"
-          sfdx sgd:source:delta --from "origin/${GITHUB_BASE_REF}" --to "HEAD" --output "." --ignore .forceignore
-          echo "# package.xml"
-          cat package/package.xml; echo ""
-          echo "# destructiveChanges.xml"
-          cat destructiveChanges/destructiveChanges.xml; echo ""
-          sfdx force:source:deploy --manifest package/package.xml --postdestructivechanges destructiveChanges/destructiveChanges.xml --wait 30 --testlevel RunLocalTests --checkonly
-```
+Create the following three GitHub Workflows:
 
 `.github/workflows/incremental-deploy.yml`
 
@@ -59,36 +22,107 @@ jobs:
 name: Incremental deployment
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      validateOnly:
+        description: "Perform a validation deployment only"
+      baseRef:
+        description: "Git base ref"
+        required: true
+      targetRef:
+        description: "Git target ref"
+        required: true
+  workflow_call:
+    inputs:
+      validateOnly:
+        description: "Perform a validation deployment only"
+        type: boolean
+      baseRef:
+        description: "Git base ref"
+        type: string
+        required: true
+      targetRef:
+        description: "Git target ref"
+        type: string
+        required: true
 
 jobs:
   default:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Salesforce CLI
-        run: |
-          npm install --global sfdx-cli
-          sfdx --version
-      - name: Install sfdx plugin
-        run: |
-          echo y | sfdx plugins:install sfdx-git-delta
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Authenticate target org
+      - name: Install sfdx
+        run: |
+          npm install --global sfdx-cli
+          sfdx --version
+      - name: Generate delta
+        run: |
+          echo y | sfdx plugins:install sfdx-git-delta
+          if [ "${{ inputs.validateOnly }}" = "true" ]; then
+            git merge "${{ inputs.baseRef }}"
+          fi
+          mkdir -p deltas
+          sfdx sgd:source:delta --from "${{ inputs.baseRef }}" --to "${{ inputs.targetRef }}" --output deltas --generate-delta --ignore .forceignore
+          echo "# package.xml"
+          cat deltas/package/package.xml; echo ""
+          echo "# destructiveChanges.xml"
+          cat deltas/destructiveChanges/destructiveChanges.xml; echo ""
+      - name: Deploy changes to target org
         run: |
           sfdx org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_AUTH_URL_TARGET_ORG }}")
-      - name: Deploy changes to target org
-        # Note: This requires the merged PR to only have a single commit or merge commit
-        run: |
-          sfdx sgd:source:delta --from "HEAD~1" --to "HEAD" --output "." --ignore .forceignore
-          echo "# package.xml"
-          cat package/package.xml; echo ""
-          echo "# destructiveChanges.xml"
-          cat destructiveChanges/destructiveChanges.xml; echo ""
-          sfdx force:source:deploy --manifest package/package.xml --postdestructivechanges destructiveChanges/destructiveChanges.xml --wait 30 --testlevel RunLocalTests
+          deployFlags=(
+            --manifest deltas/package/package.xml
+            --postdestructivechanges deltas/destructiveChanges/destructiveChanges.xml
+            --wait 30
+            --testlevel RunLocalTests
+            --verbose
+          )
+          if [ "${{ inputs.validateOnly }}" = "true" ]; then
+            deployFlags+=( --checkonly )
+          fi
+          sfdx force:source:deploy "${deployFlags[@]}"
+```
+
+`.github/workflows/pr.yml`
+
+```yaml
+name: Pull Request
+
+on:
+  pull_request:
+
+jobs:
+  incremental-deploy:
+    name: Run Incremental Deploy Workflow
+    uses: ./.github/workflows/incremental-deploy.yml
+    secrets: inherit
+    with:
+      baseRef: "origin/${GITHUB_BASE_REF}"
+      targetRef: "HEAD"
+      validateOnly: true
+```
+
+`.github/workflows/main.yml`
+
+```yaml
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  incremental-deploy:
+    name: Run Incremental Deploy Workflow
+    uses: ./.github/workflows/incremental-deploy.yml
+    secrets: inherit
+    with:
+      # Note: This requires the merged PR to only have a single commit or merge commit
+      baseRef: "HEAD~1"
+      targetRef: "HEAD"
 ```
 
 ### Step 2
