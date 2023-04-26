@@ -29,8 +29,7 @@ on:
 jobs:
   default:
     runs-on: ubuntu-latest
-    container:
-      image: salesforce/salesforcedx:latest-slim
+    container: salesforce/salesforcedx:latest-full
     steps:
       - uses: actions/checkout@v3
         with:
