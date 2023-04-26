@@ -29,14 +29,12 @@ on:
 jobs:
   default:
     runs-on: ubuntu-latest
+    container:
+      image: salesforce/salesforcedx:latest-slim
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install sfdx
-        run: |
-          npm install --global sfdx-cli
-          sfdx --version
       - name: Generate delta
         run: |
           echo y | sfdx plugins:install sfdx-git-delta
