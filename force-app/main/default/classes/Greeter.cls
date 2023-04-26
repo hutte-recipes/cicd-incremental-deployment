@@ -1,5 +1,5 @@
 public class Greeter {
-  // this is a test
+  // this is another test
   public static String greet(String name) {
     return 'Hello ' + name + ' from Greeter';
   }
