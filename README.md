@@ -149,7 +149,7 @@ Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > New
 
 Find a similar recipe on other Git Platforms:
 
-- [Gitlab](https://gitlab.com/hutte-recipes/cicd-incremental-deployment/-/tree/main)
+- [GitLab](https://gitlab.com/hutte-recipes/cicd-incremental-deployment/-/tree/main)
 - [Azure DevOps](https://dev.azure.com/hutte-recipes/_git/cicd-incremental-deployment)
 - [Bitbucket](https://bitbucket.org/hutte-recipes/cicd-incremental-deployment/src/main/)
 
