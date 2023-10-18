@@ -80,7 +80,7 @@ jobs:
             --verbose
           )
           if [ "${{ inputs.validateOnly }}" = "true" ]; then
-            deployFlags+=( --checkonly )
+            deployFlags+=( --dry-run )
           fi
           sf project deploy start "${deployFlags[@]}"
 ```
