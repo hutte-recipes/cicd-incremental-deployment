@@ -5,11 +5,4 @@ version: 1.0
 push_script: |
   sf --version
   export SF_LOG_LEVEL=fatal
-  sf project deploy start --ignore-conflicts 1>/dev/null
-
-# Shell script to run when pulling the source code from the scratch org.
-# Adding the "| hutte_track_changes" to the end of the pull command is important in order for
-# hutte to track which metadata was changed.
-pull_script: |
-  export SF_LOG_LEVEL=fatal
-  sf project retrieve start --json --ignore-conflicts | hutte_track_changes
+  sf project deploy start --wait 60 --ignore-conflicts 1>/dev/null
