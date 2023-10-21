@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - a GitHub repository with a valid sfdx project
-- a target org authenticated with sfdx locally
+- a target org authenticated with Salesforce CLI locally
 
 ## Steps
 
@@ -50,39 +50,39 @@ jobs:
   default:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install sfdx
+      - name: Install Salesforce CLI
         run: |
-          npm install --global sfdx-cli
-          sfdx --version
+          npm install --global @salesforce/cli
+          sf version
       - name: Generate delta
         run: |
-          echo y | sfdx plugins:install sfdx-git-delta
+          echo y | sf plugins:install sfdx-git-delta
           if [ "${{ inputs.validateOnly }}" = "true" ]; then
             git merge "${{ inputs.baseRef }}"
           fi
           mkdir -p deltas
-          sfdx sgd:source:delta --from "${{ inputs.baseRef }}" --to "${{ inputs.targetRef }}" --output deltas --generate-delta --ignore .forceignore
+          sf sgd:source:delta --from "${{ inputs.baseRef }}" --to "${{ inputs.targetRef }}" --output deltas --generate-delta --ignore .forceignore
           echo "# package.xml"
           cat deltas/package/package.xml; echo ""
           echo "# destructiveChanges.xml"
           cat deltas/destructiveChanges/destructiveChanges.xml; echo ""
       - name: Deploy changes to target org
         run: |
-          sfdx org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_AUTH_URL_TARGET_ORG }}")
+          sf org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_AUTH_URL_TARGET_ORG }}")
           deployFlags=(
             --manifest deltas/package/package.xml
-            --postdestructivechanges deltas/destructiveChanges/destructiveChanges.xml
+            --post-destructive-changes deltas/destructiveChanges/destructiveChanges.xml
             --wait 30
-            --testlevel RunLocalTests
+            --test-level RunLocalTests
             --verbose
           )
           if [ "${{ inputs.validateOnly }}" = "true" ]; then
-            deployFlags+=( --checkonly )
+            deployFlags+=( --dry-run )
           fi
-          sfdx force:source:deploy "${deployFlags[@]}"
+          sf project deploy start "${deployFlags[@]}"
 ```
 
 `.github/workflows/pr.yml`
@@ -130,7 +130,7 @@ jobs:
 Copy the value of `sfdxAuthUrl` to the clipboard.
 
 ```console
-sfdx org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
+sf org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
 ```
 
 Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > New repository secret`):
