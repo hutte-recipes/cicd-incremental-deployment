@@ -1,19 +1,11 @@
-# Hutte Recipe - CI/CD Incremental Deployment
-
-> This recipe uses [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta) to incrementally deploy changes.
-
-> **Note** PRs need to be merged via "Create a merge commit" or "Squash and merge" option to correctly detect the changes.
-
 ## Prerequisites
 
 - a GitHub repository with a valid sfdx project
-- a target org authenticated with Salesforce CLI locally
+- a target org authenticated with sfdx locally
 
-## Steps
+## Step 1: Create GitHub Workflows
 
-### Step 1
-
-Create the following three GitHub Workflows:
+Create the following three GitHub Workflow files:
 
 `.github/workflows/incremental-deploy.yml`
 
@@ -125,32 +117,23 @@ jobs:
       targetRef: "HEAD"
 ```
 
-### Step 2
+## Step 2: Copy Auth URL to the clipboard.
+
+Run the following code to obtain the Auth URL of the Salesforce Org you would like to deploy to:
+
+```console
+sfdx org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
+```
 
 Copy the value of `sfdxAuthUrl` to the clipboard.
 
-```console
-sf org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
-```
-
 Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > New repository secret`):
 
-| Name                       | Secret                         |
-| -------------------------- | ------------------------------ |
-| `SFDX_AUTH_URL_TARGET_ORG` | <PASTE_THE_SFDX_AUTH_URL_HERE> |
+| Name                       | Secret                           |
+| -------------------------- | -------------------------------- |
+| `SFDX_AUTH_URL_TARGET_ORG` | `<PASTE_THE_SFDX_AUTH_URL_HERE>` |
 
-### Step 3
+## Step 3: Validate
 
 - Create a PR and verify the Action was run successfully
 - Merge the PR and verify the Action was run successfully
-
-****
-## Other Git Platforms
-
-Find a similar recipe on other Git Platforms:
-
-- [GitLab](https://gitlab.com/hutte-recipes/cicd-incremental-deployment/-/tree/main)
-- [Azure DevOps](https://dev.azure.com/hutte-recipes/_git/cicd-incremental-deployment)
-- [Bitbucket](https://bitbucket.org/hutte-recipes/cicd-incremental-deployment/src/main/)
-
-****
