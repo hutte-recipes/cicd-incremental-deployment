@@ -1,13 +1,7 @@
-# Hutte Recipe - CI/CD Incremental Deployment
-
-> This recipe uses [sfdx-git-delta](https://github.com/scolladon/sfdx-git-delta) to incrementally deploy changes.
-
-> **Note** PRs need to be merged via "Create a merge commit" or "Squash and merge" option to correctly detect the changes.
-
 ## Prerequisites
 
 - a GitHub repository with a valid sfdx project
-- a target org authenticated with Salesforce CLI locally
+- a target org authenticated with sfdx locally
 
 ## Step 1: Create GitHub Workflows
 
@@ -128,7 +122,7 @@ jobs:
 Run the following code to obtain the Auth URL of the Salesforce Org you would like to deploy to:
 
 ```console
-sf org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
+sfdx org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
 ```
 
 Copy the value of `sfdxAuthUrl` to the clipboard.
