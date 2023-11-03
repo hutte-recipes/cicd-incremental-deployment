@@ -51,7 +51,7 @@ jobs:
           sf version
       - name: Generate delta
         run: |
-          echo y | sf plugins:install sfdx-git-delta
+          echo y | sf plugins install sfdx-git-delta
           if [ "${{ inputs.validateOnly }}" = "true" ]; then
             git merge "${{ inputs.baseRef }}"
           fi
