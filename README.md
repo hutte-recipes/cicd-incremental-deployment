@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - a GitHub repository with a valid sfdx project
-a target org authenticated with Salesforce CLI locally
+- a target org authenticated with Salesforce CLI locally
 
 ## Step 1: Create GitHub Workflows
 
