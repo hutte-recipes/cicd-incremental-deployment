@@ -133,20 +133,7 @@ Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > Sec
 | -------------------------- | -------------------------------- |
 | `SFDX_AUTH_URL_TARGET_ORG` | `<PASTE_THE_SFDX_AUTH_URL_HERE>` |
 
-## Step 3: Setup Github variables
-
-Create a the following Github Variables (`Settings > Secrets and variables > Actions > Variables > New repository variable`):
-
-| Name                       | Secret                           |
-| -------------------------- | -------------------------------- |
-| `GH_ACTION_BOT_USERNAME`   | `<userId>+github-actions[bot]@users.noreply.github.com` |
-| `GH_ACTION_BOT_EMAIL`      | `github-actions[bot]`            |
-
-For `GH_ACTION_BOT_USERNAME`, replace `userId` with the correct value (see more in [this discussion](https://github.com/orgs/community/discussions/26560#discussioncomment-3252341)).
-
-Note: The above git config variables are required in order that the Github actions can perform some commands such as `git merge` withing the scripts.
-
-## Step 4: Validate
+## Step 3: Validate
 
 - Create a PR and verify the Action was run successfully
 - Merge the PR and verify the Action was run successfully
