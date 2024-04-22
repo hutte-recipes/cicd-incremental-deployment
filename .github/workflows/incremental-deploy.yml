@@ -41,6 +41,8 @@ jobs:
         run: |
           echo y | sf plugins:install sfdx-git-delta
           if [ "${{ inputs.validateOnly }}" = "true" ]; then
+            git config user.email "${{ vars.GH_ACTION_BOT_EMAIL }}"
+            git config user.name "${{ vars.GH_ACTION_BOT_USERNAME }}"
             git merge "${{ inputs.baseRef }}"
           fi
           mkdir -p deltas
