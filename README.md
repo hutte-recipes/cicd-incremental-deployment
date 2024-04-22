@@ -127,7 +127,7 @@ sfdx org display --verbose --json -o <MY_TARGET_ORG_ALIAS>
 
 Copy the value of `sfdxAuthUrl` to the clipboard.
 
-Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > New repository secret`):
+Create a GitHub Action Secret (`Settings > Secrets and variables > Actions > Secrets > New repository secret`):
 
 | Name                       | Secret                           |
 | -------------------------- | -------------------------------- |
